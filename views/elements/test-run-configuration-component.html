@@ -1,0 +1,88 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="/bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="/bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="/bower_components/paper-shadow/paper-shadow.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/core-icons/image-icons.html">
+
+
+<polymer-element name="test-run-configuration" attributes="testRunConfigurationId header" extends="core-toolbar">
+    <template>
+        <paper-shadow id="shadow" z="0" class="span-shadow" animated>
+            <core-toolbar style="background: #4285f4;">
+                <paper-icon-button icon="menu" role="button" tabindex="0" aria-label="menu"></paper-icon-button>
+                <span flex="">{{header}}</span>
+                <paper-spinner id="spinner" alt="loading test run configuration" class="yellow" role="progressbar"
+                               aria-label="loading" active></paper-spinner>
+                <paper-icon-button on-click="{{refresh}}" icon="refresh" role="button" tabindex="0"
+                                   aria-label="refresh"></paper-icon-button>
+                <paper-icon-button id="editButton" on-click="{{toggleEditMode}}" icon="image:edit" role="button"
+                                   tabindex="0" aria-label="more-vert"></paper-icon-button>
+                <paper-icon-button icon="delete" role="button" tabindex="0" aria-label="more-vert"></paper-icon-button>
+                <core-ajax id="coreAjax" auto url="/testRunConfiguration/details/{{testRunConfigurationId}}"
+                           handleAs="json" on-core-response="{{ajaxResponse}}"></core-ajax>
+            </core-toolbar>
+        </paper-shadow>
+    </template>
+    <script>
+        Polymer('test-run-configuration', {
+            testRunConfigurationId: '',
+            header: 'loading...',
+            zOrder : 0,
+            editMode: {value: false, reflect: true},
+            ready: function () {
+
+            },
+            ajaxResponse: function (event, response) {
+                this.$.spinner.active = false;
+
+                console.log(response);
+            },
+
+            refresh: function (event, response) {
+                this.$.spinner.active = true;
+                this.$.coreAjax.go();
+                console.log(response);
+            },
+
+            getCurrentEditColor: function (event, response) {
+                if (this.editMode.value)
+                    return "red";
+                else
+                    return "";
+            },
+
+            getZOrder: function (event, response) {
+                if (this.editMode.value)
+                    return 3;
+                else
+                    return 0;
+            },
+
+            renderComponent: function (event, response) {
+                this.$.editButton.style.color = this.getCurrentEditColor();
+                this.$.shadow.setZ( this.getZOrder());
+                if (this.editMode.value) {
+
+                }
+                else{
+
+
+                }
+
+
+            },
+
+
+            toggleEditMode: function (event, response) {
+                this.editMode.value = !this.editMode.value;
+
+                this.renderComponent()
+            }
+
+
+        });
+    </script>
+
+</polymer-element>
